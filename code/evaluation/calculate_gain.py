@@ -11,7 +11,7 @@ import pandas as pd
 import numpy as np
 from typing import Any, List, Tuple
 from numpy import ndarray
-import hyperparameter_optimization as hp
+import hyperparameter_optimization.hyperparameter_optimization as hp
 
 
 def load_cosine_sim_matrix(cosine_similarity_matrix: str) -> pd.DataFrame:
@@ -59,7 +59,7 @@ def get_identity_dcg_matrix(similarity_matrix: pd.DataFrame, output_file: str):
     """
     # idcg_matrix = similarity_matrix.sort_values(['PMID Reference', 'Relevance Assessment'],
     #                                             ascending=[True, False], ignore_index=True)
-    idcg_matrix = similarity_matrix.sort_values(['PMID1', 'Rel-d2d'],
+    idcg_matrix = similarity_matrix.sort_values(['PMID1', 'Relevance'],
                                                 ascending=[True, False], ignore_index=True)                                                
     idcg_matrix.index = idcg_matrix.index + 1
     # idcg_matrix.to_csv("./data/doc2vec-doc/idcg_doc2vec-doc.tsv", sep='\t')
@@ -83,7 +83,7 @@ def calculate_dcg_at_n(n: int, all_assessed_pmids: pd.DataFrame) -> float:
     dcg_n = 0
     for i, (index, row) in enumerate(all_assessed_pmids[:n].iterrows(), start=1):
         # rel = row['Relevance Assessment']
-        rel = row['Rel-d2d']
+        rel = row['Relevance']
         value = (2**rel - 1) / math.log2(i + 1)
         dcg_n += value
     return round(dcg_n, 4)
@@ -107,7 +107,7 @@ def calculate_idcg_at_n(n: int, sorted_assessed_pmids: pd.DataFrame) -> float:
     idcg_n = 0
     for i, (index, row) in enumerate(sorted_assessed_pmids[:n].iterrows(), start=1):
         # rel = row['Relevance Assessment']
-        rel = row['Rel-d2d']
+        rel = row['Relevance']
         value = (2**rel - 1) / math.log2(i + 1)
         idcg_n += value
     return round(idcg_n, 4)
@@ -178,7 +178,8 @@ def write_to_tsv(pmids: list, ndcg_matrix: np.matrix, output_file: str):
 def relish_run():
     hp_df = hp.generate_hyperparameters(hp.params_d2v)
 
-    for index, row in hp_df.iterrows():
+    # for index, row in hp_df.iterrows():
+    for index, item in enumerate(hp_df):
         print ("Row: " + str(index), flush=True)
 
         sim_matrix = load_cosine_sim_matrix("Data/RELISH/nDCG-gain/Cosine_Similarities/relish_cosine_" + str(index) + ".tsv")
