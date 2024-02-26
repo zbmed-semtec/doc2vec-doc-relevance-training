@@ -1,4 +1,5 @@
 import tqdm
+import gensim
 import numpy as np
 import pandas as pd
 from scipy.spatial.distance import cosine

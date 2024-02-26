@@ -8,7 +8,7 @@ import utilities as utilities
 log_file = "Doc2Vec_Split_data.log"
 logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 
-def run(best_params, args):
+def run(best_params, args, save_model=False):
     # Load the training data
     train_pmids, train_docs = utilities.process_data_from_npy(args.input)
     print("Retrieved RELISH Cleaned Data")
@@ -22,6 +22,13 @@ def run(best_params, args):
     logging.info("Time taken to train the model: {end - start} seconds")
     print("RELISH Doc2Vec Model Generated")
     logging.info("RELISH Doc2Vec Model Generated")
+
+    print(model, "Model is being used.")
+
+    if save_model:
+        # Save the model
+        utilities.saveDoc2VecModel(model, "output_doc2vec/best_model.model")
+
 
     # Load the test data
     test_pmids, test_docs = utilities.process_data_from_npy(args.test)
@@ -41,35 +48,14 @@ def run(best_params, args):
     logging.info("RELISH Embeddings Pickle File Saved")
 
     # Define the directory for storing similarity results
-    similarity_directory = "similarity_doc2vec"
-    if not os.path.exists(similarity_directory):
-        os.makedirs(similarity_directory)
+    output_directory = "output_doc2vec"
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
 
     # Generate and save the cosine similarity matrix
-    similarity_file = os.path.join(similarity_directory, "cosine_similarity.tsv")
+    similarity_file = os.path.join(output_directory, "cosine_similarity.tsv")
     utilities.get_similarity_scores(args.ground_truth, embeddings_file, similarity_file)
     print("RELISH Cosine Similarity Matrix Saved")
     logging.info("RELISH Cosine Similarity Matrix Saved")
 
-    return model, similarity_file
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", type=str,
-                       help="Path to input (train) RELISH tokenized .npy file")   
-    parser.add_argument("-t", "--test", type=str, 
-                        help="Path to test RELISH tokenized .npy file")      
-    parser.add_argument("-gt", "--ground_truth", type=str,
-                        help="Path to ground truth .tsv file") 
-            
-    args = parser.parse_args()
-
-    params = {
-        "vector_size": 300,
-        "window": 5,
-        "min_count": 1,
-        "epochs": 20,
-        "workers": 4
-    }
-
-    run(params, args)
+    return similarity_file
