@@ -12,7 +12,7 @@ if __name__ == "__main__":
     parser.add_argument("-gt", "--ground_truth", help="Path to ground truth .tsv file")
     args = parser.parse_args()
 
-    best_params, best_trial = run_optuna_optimization(args, n_trials=2, n_jobs=2)
+    best_params, best_trial = run_optuna_optimization(args, n_trials=100, n_jobs=2)
 
     print("Finished Optuna optimization")
     similarity_file = run(best_params, args, save_model=True)

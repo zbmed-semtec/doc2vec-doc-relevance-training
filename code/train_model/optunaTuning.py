@@ -22,10 +22,10 @@ os.chmod(model_directory, permissions)
 def objective_wrapper(args):
     def objective(trial):
         # Suggest hyperparameters for Doc2Vec
-        vector_size = trial.suggest_int('vector_size', 200, 300)
+        vector_size = trial.suggest_int('vector_size', 100, 500, step=5)
         window = trial.suggest_int('window', 5, 15)
         min_count = trial.suggest_int('min_count', 1, 5)
-        epochs = trial.suggest_int('epochs', 1, 2)
+        epochs = trial.suggest_int('epochs', 5, 15)
         workers = trial.suggest_int('workers', 2, 8)
 
         # Use args here as needed, e.g., args.input, args.test
@@ -51,7 +51,7 @@ def objective_wrapper(args):
         return precision_5
     return objective
 
-def run_optuna_optimization(args, n_trials=3, n_jobs=1):
+def run_optuna_optimization(args, n_trials=10, n_jobs=1):
     study = optuna.create_study(direction='maximize')
     with tqdm(total=n_trials) as pbar:
         def callback(study, trial):
