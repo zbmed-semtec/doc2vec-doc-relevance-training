@@ -130,20 +130,9 @@ deactivate
 - Download the dataset from this link: [Split_Dataset](https://drive.google.com/drive/folders/1Bq_U5207utn7tvSt_HLVdOdYR5QW7MMN)
 - Keep the data in the below-specified format
 
-├── doc2vec-doc-relevance-training
-│   ├── data
-│   │   ├── Split_Dataset
-│   │   │   ├── Data
-|   │   │   │   ├── Test
-|   │   │   │   │   ├── test_20.npy
-|   │   │   │   ├── Train
-|   │   │   │   │   ├── train_80.npy
-│   │   │   ├── Ground_truth
-|   │   │   │   ├── relish_ground_truth_test.tsv
-|   │   │   │   ├── relish_ground_truth_train.tsv
-└── .gitignore
+![image](https://github.com/zbmed-semtec/doc2vec-doc-relevance-training/assets/62026329/4972f596-2aa3-45a4-be85-32cc051df3d3)
 
-### Step 3: Optimization Pipeline
+### Step 4: Optimization Pipeline
 
 This pipeline aims to optimize hyperparameters for a Doc2Vec model using Optuna, train the model with the optimal parameters, and evaluate its performance using precision at N (Precision@N) and normalized discounted cumulative gain (NDCG) metrics.
 
