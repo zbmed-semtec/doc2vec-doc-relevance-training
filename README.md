@@ -130,7 +130,7 @@ deactivate
 - Download the dataset from this link: [Split_Dataset](https://drive.google.com/drive/folders/1Bq_U5207utn7tvSt_HLVdOdYR5QW7MMN)
 - Keep the data in the below-specified format
 
-![image](https://github.com/zbmed-semtec/doc2vec-doc-relevance-training/assets/62026329/4972f596-2aa3-45a4-be85-32cc051df3d3)
+![image](https://github.com/zbmed-semtec/doc2vec-doc-relevance-training/assets/62026329/7b585c09-1fc3-4122-bf27-42c957de6edf)
 
 ### Step 4: Optimization Pipeline
 
@@ -154,13 +154,15 @@ python3 code/train_model/main.py [-i INPUT] [-t TEST_FILE] [-gt TEST_GROUND_TRUT
 You must pass the following four arguments:
 
 + -i/ --input : File path to the RELISH Train split dataset (.npy file format).
++ -v/ --valid :  File path to the RELISH Validation split dataset (.npy file format).
 + -t/ --test :  File path to the RELISH Test split dataset (.npy file format).
-+ -gt/ --ground_truth : File path for the Test split ground truth (.tsv file format).
++ -gv/ --valid_ground_truth : File path for the Validation split ground truth (.tsv file format).
++ -gt/ --test_ground_truth : File path for the Test split ground truth (.tsv file format).
 
 To run this script, please execute the following command:
 
 ```
-python3 code/train_model/main.py -i data/Split_Dataset/Data/Train/train_80.npy -t data/Split_Dataset/Data/Test/Test_20.npy -gt data/Split_Dataset/Ground_truth/relish_ground_truth_test.tsv
+python3 code/train_model/main.py -i data/Split_Dataset/Data/Train/train.npy -v data/Split_Dataset/Data/Valid/Valid.npy -t data/Split_Dataset/Data/Test/Test.npy -gv data/Split_Dataset/Ground_truth/relish_ground_truth_valid.tsv -gt data/Split_Dataset/Ground_truth/relish_ground_truth_test.tsv
 ```
 
 Precision@N and NDCG scores are saved to TSV files in the following folder path: \output\doc2vec\ for further analysis and reporting.
