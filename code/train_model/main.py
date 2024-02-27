@@ -8,14 +8,16 @@ import calculate_gain
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", help="Path to input (train) file")
-    parser.add_argument("-t", "--test", help="Path to test file")
-    parser.add_argument("-gt", "--ground_truth", help="Path to ground truth .tsv file")
+    parser.add_argument("-v", "--valid", help="Path to validation data file")
+    parser.add_argument("-t", "--test", help="Path to test data file")
+    parser.add_argument("-gv", "--valid_ground_truth", help="Path to valid ground truth .tsv file")
+    parser.add_argument("-gt", "--test_ground_truth", help="Path to valid ground truth .tsv file")
     args = parser.parse_args()
 
     best_params, best_trial = run_optuna_optimization(args, n_trials=100, n_jobs=2)
 
     print("Finished Optuna optimization")
-    similarity_file = run(best_params, args, save_model=True)
+    similarity_file = run(best_params, args)
 
     output_directory = "output_doc2vec"
     precision_file = os.path.join(output_directory, "precision.tsv")

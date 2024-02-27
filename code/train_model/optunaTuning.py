@@ -41,7 +41,7 @@ def objective_wrapper(args):
         # os.chmod(model_directory, permissions)
 
         # Assume run() trains the model and returns the path to a file with similarity scores
-        similarity_file = run(params, args)
+        similarity_file = run(params, args, tuning = True)
         
         ref_pmids, data = precision.read_file(similarity_file)
         vector = precision.generate_vector(ref_pmids, data)

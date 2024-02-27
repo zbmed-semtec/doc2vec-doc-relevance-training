@@ -104,8 +104,8 @@ def get_similarity_scores(input_relevance_matrix, embeddings, output_matrix_name
     embeddings_df = pd.read_pickle(embeddings)
     
     # Read Relevance matrix
-    # column_names = ["PID1", "PID2", "Value"]
-    relevance_matrix_df = pd.read_csv(input_relevance_matrix, sep="\t")
+    column_names = ["PID1", "PID2", "Value"]
+    relevance_matrix_df = pd.read_csv(input_relevance_matrix, sep="\t", names = column_names, skiprows=1)
 
     # Adds empty columns to the file to store similarity scores
     relevance_matrix_df["Cosine Similarity"] = ""
@@ -130,8 +130,6 @@ def get_similarity_scores(input_relevance_matrix, embeddings, output_matrix_name
         except KeyError as e:
             print(f"\nKeyError: {e}, ref_pmid: {ref_pmid}, assessed_pmid: {assessed_pmid}")
             break
-
-        relevance_matrix_df.loc[(relevance_matrix_df['PID1'] == ref_pmid) & (relevance_matrix_df['PID2'] == assessed_pmid), 'Cosine Similarity'] = cosine_similarity
 
     print('Added similarity scores')
     

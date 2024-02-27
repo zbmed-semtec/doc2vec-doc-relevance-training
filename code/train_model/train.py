@@ -8,7 +8,7 @@ import utilities as utilities
 log_file = "Doc2Vec_Split_data.log"
 logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 
-def run(best_params, args, save_model=False):
+def run(best_params, args, tuning=False):
     # Load the training data
     train_pmids, train_docs = utilities.process_data_from_npy(args.input)
     print("Retrieved RELISH Cleaned Data")
@@ -25,13 +25,13 @@ def run(best_params, args, save_model=False):
 
     print(model, "Model is being used.")
 
-    if save_model:
-        # Save the model
-        utilities.saveDoc2VecModel(model, "output_doc2vec/best_model.model")
-
-
-    # Load the test data
-    test_pmids, test_docs = utilities.process_data_from_npy(args.test)
+    if tuning:
+        # use validation dataset for tuning
+        test_pmids, test_docs = utilities.process_data_from_npy(args.valid)
+    else:
+        # use test dataset for final evaluation
+        test_pmids, test_docs = utilities.process_data_from_npy(args.test)
+        
     print("Retrieved RELISH Cleaned Data")
     logging.info("Retrieved RELISH Cleaned Data")
 
@@ -54,7 +54,10 @@ def run(best_params, args, save_model=False):
 
     # Generate and save the cosine similarity matrix
     similarity_file = os.path.join(output_directory, "cosine_similarity.tsv")
-    utilities.get_similarity_scores(args.ground_truth, embeddings_file, similarity_file)
+    if tuning:
+        utilities.get_similarity_scores(args.valid_ground_truth, embeddings_file, similarity_file)
+    else:
+        utilities.get_similarity_scores(args.test_ground_truth, embeddings_file, similarity_file)
     print("RELISH Cosine Similarity Matrix Saved")
     logging.info("RELISH Cosine Similarity Matrix Saved")
 
