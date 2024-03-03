@@ -5,6 +5,10 @@ import pandas as pd
 from scipy.spatial.distance import cosine
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from typing import Union, List
+import logging
+
+log_file = 'output.log'
+logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 
 # Retrieves cleaned data from RELISH and TREC npy files
 def process_data_from_npy(file_path_in: str = None) -> Union[List[str], List[List[str]], List[List[str]], List[List[str]]]:
@@ -33,20 +37,24 @@ def process_data_from_npy(file_path_in: str = None) -> Union[List[str], List[Lis
     doc = np.load(file_path_in, allow_pickle=True)
 
     pmids = []
-    titles = []
-    abstracts = []
     docs = []
 
     for line in doc:
-        pmids.append(line[1])
-        title_content = line[2].strip('][').split(', ')
-        title = ' '.join(title_content).replace("\'", "")
-        title_tokens = title.split(" ")
-        titles.append(title_tokens)
-        abstract_content = line[3].strip('][').split(', ')
-        abstract = ' '.join(abstract_content).replace("\'", "")
-        abstract_tokens = abstract.split(" ")
-        abstracts.append(abstract_tokens)
+        pmids.append(line[0])
+        if type(line[1]) == str:
+            title_content = line[1].strip('][').split(', ')
+            title = ' '.join(title_content).replace("\'", "")
+            title_tokens = title.split(" ")
+        else:
+            title_tokens = line[1]
+            
+        if type(line[2]) == str:
+            abstract_content = line[2].strip('][').split(', ')
+            abstract = ' '.join(abstract_content).replace("\'", "")
+            abstract_tokens = abstract.split(" ")
+        else:
+            abstract_tokens = line[2]
+        
         docs.append(title_tokens + abstract_tokens)
         
     return (pmids, docs)
@@ -102,6 +110,8 @@ def calculate_cosine_similarity(vec1, vec2):
 def get_similarity_scores(input_relevance_matrix, embeddings, output_matrix_name):
     # Read Embeddings
     embeddings_df = pd.read_pickle(embeddings)
+
+    logging.info("Embeddings DataFrame Loaded")
     
     # Read Relevance matrix
     column_names = ["PID1", "PID2", "Value"]
@@ -109,11 +119,8 @@ def get_similarity_scores(input_relevance_matrix, embeddings, output_matrix_name
 
     # Adds empty columns to the file to store similarity scores
     relevance_matrix_df["Cosine Similarity"] = ""
-
-    print(relevance_matrix_df)
-
-    # Create a dictionary to store embeddings
-    embeddings_dict = {pmid: embedding for pmid, embedding in zip(embeddings_df['PID'], embeddings_df['Embedding'])}
+    
+    embeddings_dict = {int(pmid): embedding for pmid, embedding in zip(embeddings_df['PID'], embeddings_df['Embedding'])}
 
     # Create a list of ref and assessed PMID pairs
     pmid_pairs = list(zip(relevance_matrix_df["PID1"], relevance_matrix_df["PID2"]))
@@ -126,16 +133,16 @@ def get_similarity_scores(input_relevance_matrix, embeddings, output_matrix_name
                 cosine_similarity = round(calculate_cosine_similarity(ref_pmid_vector, assessed_pmid_vector), 4)
                 relevance_matrix_df.loc[(relevance_matrix_df['PID1'] == ref_pmid) & (relevance_matrix_df['PID2'] == assessed_pmid), 'Cosine Similarity'] = cosine_similarity
             else:
-                print(f"One of the vectors is None for ({ref_pmid}, {assessed_pmid})")
+                logging.info(f"One of the vectors is None for ({ref_pmid}, {assessed_pmid})")
         except KeyError as e:
-            print(f"\nKeyError: {e}, ref_pmid: {ref_pmid}, assessed_pmid: {assessed_pmid}")
+            logging.info(f"\nKeyError: {e}, ref_pmid: {ref_pmid}, assessed_pmid: {assessed_pmid}")
             break
 
     print('Added similarity scores')
     
     # Saves the updated matrix 
     relevance_matrix_df.to_csv(output_matrix_name, index=False, sep="\t")
-    print('Saved matrix')
+    logging.info('Saved matrix')
 
 def generate_embeddings(model, pmids, docs, output_file):
     embeddings_list = []
