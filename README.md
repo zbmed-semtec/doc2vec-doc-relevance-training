@@ -162,7 +162,7 @@ You must pass the following four arguments:
 To run this script, please execute the following command:
 
 ```
-python3 code/train_model/main.py -i data/Split_Dataset/Data/Train/train.npy -v data/Split_Dataset/Data/Valid/Valid.npy -t data/Split_Dataset/Data/Test/Test.npy -gv data/Split_Dataset/Ground_truth/relish_ground_truth_valid.tsv -gt data/Split_Dataset/Ground_truth/relish_ground_truth_test.tsv
+python3 code/train_model/main.py -i data/Split_Dataset/Data/Train/train.npy -v data/Split_Dataset/Data/Valid/valid.npy -t data/Split_Dataset/Data/Test/test.npy -gv data/Split_Dataset/Ground_truth/relish_ground_truth_valid.tsv -gt data/Split_Dataset/Ground_truth/relish_ground_truth_test.tsv
 ```
 
 Precision@N and NDCG scores are saved to TSV files in the following folder path: \output\doc2vec\ for further analysis and reporting.
