@@ -86,7 +86,7 @@ def generate_vector(ref_pmids: list, data: pd.DataFrame) -> np.array:
         if len(sorted_collection) >= max(value_of_n):
             for index, n in enumerate(value_of_n):
                 precision_n = calculate_precision(sorted_collection, n)
-                precision_matrix[pmid_index][index] = precision_n
+                precision_vector[pmid_index][index] = precision_n
         else:
             continue
     return precision_vector
