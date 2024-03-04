@@ -83,9 +83,12 @@ def generate_vector(ref_pmids: list, data: pd.DataFrame) -> np.array:
     precision_vector = np.empty(shape=(len(ref_pmids), len(value_of_n)))
     for pmid_index, pmid in enumerate(ref_pmids):
         sorted_collection = sort_collection(pmid, data)
-        for index, n in enumerate(value_of_n):
-            precision_n = calculate_precision(sorted_collection, n)
-            precision_vector[pmid_index][index] = precision_n
+        if len(sorted_collection) >= max(value_of_n):
+            for index, n in enumerate(value_of_n):
+                precision_n = calculate_precision(sorted_collection, n)
+                precision_matrix[pmid_index][index] = precision_n
+        else:
+            continue
     return precision_vector
 
 def generate_matrix(ref_pmids: list, data: pd.DataFrame) -> np.array:
