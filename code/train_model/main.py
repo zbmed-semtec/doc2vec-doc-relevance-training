@@ -35,7 +35,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     st = time.time()
-    best_params, best_trial = run_optuna_optimization(args, n_trials=100d, n_jobs=2)
+    best_params, best_trial = run_optuna_optimization(args, n_trials=100, n_jobs=2)
     optimization_results = {
         'best_params': best_params,
         'best_trial': best_trial
