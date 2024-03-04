@@ -1,4 +1,5 @@
 import os
+import json
 import shutil
 import time
 import argparse
@@ -34,9 +35,18 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     st = time.time()
-    best_params, best_trial = run_optuna_optimization(args, n_trials=100, n_jobs=2)
-    print(best_params)
-    print(best_trial)
+    best_params, best_trial = run_optuna_optimization(args, n_trials=100d, n_jobs=2)
+    optimization_results = {
+        'best_params': best_params,
+        'best_trial': best_trial
+    }
+
+    # Specify the filename
+    filename = 'optimization_results.json'
+
+    # Writing to a file
+    with open(filename, 'w') as f:
+        json.dump(optimization_results, f, indent=4)
 
     print("Finished Optuna optimization")
     et = time.time()
