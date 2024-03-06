@@ -32,7 +32,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--test", help="Path to test data file")
     parser.add_argument("-gv", "--valid_ground_truth", help="Path to valid ground truth .tsv file")
     parser.add_argument("-gt", "--test_ground_truth", help="Path to valid ground truth .tsv file")
-    parser.add_argument("-c", "--classes", help="Number of classes")
+    parser.add_argument("-c", "--classes", type=int, default=3, help="Number of classes")
     args = parser.parse_args()
 
     st = time.time()
