@@ -41,7 +41,7 @@ def objective_wrapper(args):
         similarity_file = run(params, args, tuning = False) #False uses Test split; True uses Validation split
         
         ref_pmids, data = precision.read_file(similarity_file)
-        vector = precision.generate_vector(ref_pmids, data)
+        vector = precision.generate_vector(ref_pmids, data, args.classes)
 
         precision_5 = list(np.mean(vector, axis=0).round(4))
 

@@ -37,9 +37,10 @@ def run(best_params, args, tuning):
     logging.info("Retrieved RELISH Cleaned Data")
 
     # Define a directory for storing embeddings
-    embeddings_directory = "embeddings"
+    embeddings_directory = f"embeddings_{args.classes}"
     if not os.path.exists(embeddings_directory):
         os.makedirs(embeddings_directory)
+
         
     embedding_file = f"embedding_{int(time.time())}.pkl"
     embeddings_file = os.path.join(embeddings_directory, embedding_file)
@@ -50,7 +51,7 @@ def run(best_params, args, tuning):
     logging.info("RELISH Embeddings Pickle File Saved")
 
     # Define the directory for storing similarity results
-    output_directory = "output_doc2vec"
+    output_directory = f"output_{args.classes}"
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
 

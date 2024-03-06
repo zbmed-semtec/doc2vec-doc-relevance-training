@@ -32,42 +32,43 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--test", help="Path to test data file")
     parser.add_argument("-gv", "--valid_ground_truth", help="Path to valid ground truth .tsv file")
     parser.add_argument("-gt", "--test_ground_truth", help="Path to valid ground truth .tsv file")
+    parser.add_argument("-c", "--classes", help="Number of classes")
     args = parser.parse_args()
 
     st = time.time()
     best_params, best_trial = run_optuna_optimization(args, n_trials=100, n_jobs=2)
+    print("Finished Optuna optimization")
+    et = time.time()
+    print("Time taken: ", et-st)
+
     optimization_results = {
         'best_params': best_params,
         'best_trial': best_trial
     }
-
-    # Specify the filename
-    filename = 'optimization_results.json'
+    
+    filename = f'optimization_results_{args.classes}.json'
 
     # Writing to a file
     with open(filename, 'w') as f:
         json.dump(optimization_results, f, indent=4)
 
-    print("Finished Optuna optimization")
-    et = time.time()
-    print("Time taken: ", et-st)
-
-    directories = ["output_doc2vec", "embeddings"]
+    directories = [f"output_{args.classes}", f"embeddings_{args.classes}"]
+    # Clear the directories
     for directory in directories:
         clear_directory(directory)
 
-    output_directory = "output_doc2vec"
+    output_directory = directories[0]
     similarity_file = run(best_params, args, tuning=False)
 
-    precision_file = os.path.join(output_directory, "precision.tsv")
-    dcg_file = os.path.join(output_directory, "dcg.tsv")
-    idcg_file = os.path.join(output_directory, "idcg.tsv")
-    ndcg_file = os.path.join(output_directory, "ndcg.tsv")
+    precision_file = os.path.join(output_directory, f"precision_{args.classes}.tsv")
+    dcg_file = os.path.join(output_directory, f"dcg_{args.classes}.tsv")
+    idcg_file = os.path.join(output_directory, f"idcg_{args.classes}.tsv")
+    ndcg_file = os.path.join(output_directory, f"ndcg_{args.classes}.tsv")
 
     # Generate and save the precision matrix
     ref_pmids, data = precision.read_file(similarity_file)
-    matrix = precision.generate_matrix(ref_pmids, data)
-    precision.write_to_tsv(ref_pmids, matrix, precision_file)
+    matrix = precision.generate_matrix(ref_pmids, data, args.classes)
+    precision.write_to_tsv(ref_pmids, matrix, precision_file, data)
     print("Final precision matrix saved")
 
     # Generate and save the DCG and IDCG matrices
