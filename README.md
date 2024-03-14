@@ -148,7 +148,7 @@ This pipeline aims to optimize hyperparameters for a Doc2Vec model using Optuna,
 In order to start the pipeline execution use this [script](/code/train_model/main.py), and run the following command:
 
 ```
-python3 code/train_model/main.py [-i INPUT] [-t TEST_FILE] [-gt TEST_GROUND_TRUTH]
+python3 code/train_model/main.py [-i INPUT] [-v VALIDATION_FILE] [-t TEST_FILE] [-gv VALIDATION_GROUND_TRUTH] [-gt TEST_GROUND_TRUTH] [-c NO_OF CLASSES]
 ```
 
 You must pass the following four arguments:
@@ -158,14 +158,15 @@ You must pass the following four arguments:
 + -t/ --test :  File path to the RELISH Test split dataset (.npy file format).
 + -gv/ --valid_ground_truth : File path for the Validation split ground truth (.tsv file format).
 + -gt/ --test_ground_truth : File path for the Test split ground truth (.tsv file format).
++ -c/  --classes : No. of classes to perform optimization on (Integer 2 or 3/ Default value is 3)
 
 To run this script, please execute the following command:
 
 ```
-python3 code/train_model/main.py -i data/Split_Dataset/Data/Train/train.npy -v data/Split_Dataset/Data/Valid/valid.npy -t data/Split_Dataset/Data/Test/test.npy -gv data/Split_Dataset/Ground_truth/relish_ground_truth_valid.tsv -gt data/Split_Dataset/Ground_truth/relish_ground_truth_test.tsv
+python3 code/train_model/main.py -i data/Split_Dataset/Data/Train/train.npy -v data/Split_Dataset/Data/Valid/valid.npy -t data/Split_Dataset/Data/Test/test.npy -gv data/Split_Dataset/Ground_truth/relish_ground_truth_valid.tsv -gt data/Split_Dataset/Ground_truth/relish_ground_truth_test.tsv -c 2
 ```
 
-Precision@N and NDCG scores are saved to TSV files in the following folder path: \output\doc2vec\ for further analysis and reporting.
+Precision@N and NDCG scores are saved to TSV files in the following folder path: \output_2 (2 classes) and \output_3 (3 classes) for further analysis and reporting.
 
 ## Tutorial
 A [tutorial](./docs/embeddings/) is accessible in the form of a Jupyter notebook for the generation of embeddings.
