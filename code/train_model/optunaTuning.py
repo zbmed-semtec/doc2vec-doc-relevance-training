@@ -22,6 +22,7 @@ os.chmod(model_directory, permissions)
 def objective_wrapper(args):
     def objective(trial):
         # Suggest hyperparameters for Doc2Vec
+        dm = trial.suggest_int('dm', 0, 1)
         vector_size = trial.suggest_int('vector_size', 100, 500, step=5)
         window = trial.suggest_int('window', 5, 15)
         min_count = trial.suggest_int('min_count', 1, 5)
@@ -30,6 +31,7 @@ def objective_wrapper(args):
 
         # Use args here as needed, e.g., args.input, args.test
         params = {
+            "dm": dm,
             "vector_size": vector_size,
             "window": window,
             "min_count": min_count,
