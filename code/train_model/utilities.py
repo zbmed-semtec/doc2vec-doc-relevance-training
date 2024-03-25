@@ -40,20 +40,20 @@ def process_data_from_npy(file_path_in: str = None) -> Union[List[str], List[Lis
     docs = []
 
     for line in doc:
-        pmids.append(line[1])
-        if type(line[2]) == str:
-            title_content = line[2].strip('][').split(', ')
+        pmids.append(line[0])
+        if type(line[1]) == str:
+            title_content = line[1].strip('][').split(', ')
             title = ' '.join(title_content).replace("\'", "")
             title_tokens = title.split(" ")
         else:
-            title_tokens = line[2]
+            title_tokens = line[1]
             
-        if type(line[3]) == str:
-            abstract_content = line[3].strip('][').split(', ')
+        if type(line[2]) == str:
+            abstract_content = line[2].strip('][').split(', ')
             abstract = ' '.join(abstract_content).replace("\'", "")
             abstract_tokens = abstract.split(" ")
         else:
-            abstract_tokens = line[3]
+            abstract_tokens = line[2]
         
         docs.append(title_tokens + abstract_tokens)
         
