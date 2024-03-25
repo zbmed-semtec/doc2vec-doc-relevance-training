@@ -40,20 +40,20 @@ def process_data_from_npy(file_path_in: str = None) -> Union[List[str], List[Lis
     docs = []
 
     for line in doc:
-        pmids.append(line[0])
-        if type(line[1]) == str:
-            title_content = line[1].strip('][').split(', ')
+        pmids.append(line[1])
+        if type(line[2]) == str:
+            title_content = line[2].strip('][').split(', ')
             title = ' '.join(title_content).replace("\'", "")
             title_tokens = title.split(" ")
         else:
-            title_tokens = line[1]
+            title_tokens = line[2]
             
-        if type(line[2]) == str:
-            abstract_content = line[2].strip('][').split(', ')
+        if type(line[3]) == str:
+            abstract_content = line[3].strip('][').split(', ')
             abstract = ' '.join(abstract_content).replace("\'", "")
             abstract_tokens = abstract.split(" ")
         else:
-            abstract_tokens = line[2]
+            abstract_tokens = line[3]
         
         docs.append(title_tokens + abstract_tokens)
         
@@ -103,6 +103,23 @@ def saveDoc2VecModel(model: Doc2Vec, output_file: str) -> None:
             File path of the Doc2Vec model generated.
     """
     model.save(output_file)
+
+def loadDoc2VecModel(model_path: str) -> None:
+    """
+    Loads the saved Doc2Vec model.
+
+    Parameters
+    ----------
+    model_path: str
+            Path of the Doc2Vec model.
+
+    Return
+    ----------
+    model: Doc2Vec
+            Doc2Vec model.
+    """
+    model = gensim.models.Doc2Vec.load(model_path)
+    return model
 
 def calculate_cosine_similarity(vec1, vec2):
     return 1 - cosine(vec1, vec2)
