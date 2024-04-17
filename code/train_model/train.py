@@ -35,7 +35,7 @@ def run(best_params, args, tuning=False, save_model=False):
     print(f"RELISH {dataset_type} Embeddings Pickle File Generated.")
 
     # 6) Generate the cosine similarity matrix: pd.DataFrame for the generated embeddings
-    similarity_df = utilities.get_similarity_scores(ground_truth, embeddings_file)
+    similarity_df = utilities.get_similarity_scores(ground_truth, embeddings_df)
     print(f"RELISH {dataset_type} Cosine Similarity Matrix Generated.")
 
     # 7) If the dataset type is "Test", then save the dataframes to a file each

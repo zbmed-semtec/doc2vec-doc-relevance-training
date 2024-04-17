@@ -33,12 +33,12 @@ def save_data_with_lock(file_path, data, save_function):
     with open(file_path, "w") as lock_file:
         try:
             # Lock the file to prevent other processes from modifying it simultaneously.
-            fcntl.flock(model_lock_file.fileno(), fcntl.LOCK_EX)
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
             # Save the data to the file.
             save_function(data, file_path)
         finally:
             # Always unlock the file when done, ensuring the file is not left in a locked state.
-            fcntl.flock(model_lock_file.fileno(), fcntl.LOCK_UN)
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
 
 def save_model_data(args, model, embeddings, similarity):
 
@@ -54,7 +54,7 @@ def save_model_data(args, model, embeddings, similarity):
     save_data_with_lock(embeddings_file, embeddings, utilities.save_embeddings_to_pickle)
 
     # 4) Save the similarity scores
-    save_data_with_lock(similarity_file, similarity, utilities.save_similarity_scores)
+    save_data_with_lock(similarity_file, similarity, utilities.save_similarity_to_tsv)
 
 
 def objective_wrapper(args):

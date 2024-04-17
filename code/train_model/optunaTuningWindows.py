@@ -54,7 +54,7 @@ def save_model_data(args, model, embeddings, similarity):
     save_data_with_lock(embeddings_file, embeddings, utilities.save_embeddings_to_pickle)
 
     # 4) Save the similarity scores
-    save_data_with_lock(similarity_file, similarity, utilities.save_similarity_scores)
+    save_data_with_lock(similarity_file, similarity, utilities.save_similarity_to_tsv)
 
 
 def objective_wrapper(args):
