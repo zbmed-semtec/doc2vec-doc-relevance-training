@@ -51,22 +51,19 @@ if __name__ == "__main__":
     precision_file = os.path.join(results_directory, f"precision_{args.classes}.tsv")
     dcg_file = os.path.join(results_directory, f"dcg_{args.classes}.tsv")
     idcg_file = os.path.join(results_directory, f"idcg_{args.classes}.tsv")
-    ndcg_file = os.path.join(results_directory, f"ndcg_{args.classes}.tsv")
-
-    # 6) Define the log file path
-    
+    ndcg_file = os.path.join(results_directory, f"ndcg_{args.classes}.tsv")    
 
     # 6) Run optuna optimization based on the operating system
     # Optuna can run multiple trials concurrently using n_jobs parallel processes or threads
     if args.windows:
         from optunaTuningWindows import run_optuna_optimization
         start = time.time()
-        best_params, best_trial = run_optuna_optimization(args, log_file=log_file, n_trials=100, n_jobs=6)
+        best_params, best_trial = run_optuna_optimization(args, n_trials=100, n_jobs=6)
         print("Finished optuna optimization. Time taken:", time.time()-start)
     else:
         from optunaTuningUnix import run_optuna_optimization
         start = time.time()
-        best_params, best_trial = run_optuna_optimization(args, log_file=log_file, n_trials=100, n_jobs=6)
+        best_params, best_trial = run_optuna_optimization(args, n_trials=100, n_jobs=6)
         print("Finished optuna optimization. Time taken:", time.time()-start)
 
     # 7) Define the file paths to store the similarity file based on optuna trial run results
