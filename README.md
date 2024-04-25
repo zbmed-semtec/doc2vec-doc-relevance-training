@@ -128,9 +128,15 @@ deactivate
 ```
 ### Step 3: Dataset
 - Download the dataset from this link: [Split_Dataset](https://drive.google.com/drive/folders/1Bq_U5207utn7tvSt_HLVdOdYR5QW7MMN)
-- Keep the data in the below-specified format
+- Use [Download_Data.sh](https://github.com/zbmed-semtec/doc2vec-doc-relevance-training/blob/main/Download_Dataset.sh) script to download the Split Dataset in the below mentioned format.
 
-![image](https://github.com/zbmed-semtec/doc2vec-doc-relevance-training/assets/62026329/7b585c09-1fc3-4122-bf27-42c957de6edf)
+```
+chmod +777 Download_Data.sh
+./Download_Data.sh
+```
+- The data in the below-specified format
+
+![image](https://github.com/zbmed-semtec/doc2vec-doc-relevance-training/assets/62026329/a8e84f15-2595-4292-a44c-70687dd9aea3)
 
 ### Step 4: Optimization Pipeline
 
@@ -148,7 +154,7 @@ This pipeline aims to optimize hyperparameters for a Doc2Vec model using Optuna,
 In order to start the pipeline execution use this [script](/code/train_model/main.py), and run the following command:
 
 ```
-python3 code/train_model/main.py [-i INPUT] [-v VALIDATION_FILE] [-t TEST_FILE] [-gv VALIDATION_GROUND_TRUTH] [-gt TEST_GROUND_TRUTH] [-c NO_OF CLASSES]
+python3 code/train_model/main.py [-i INPUT] [-v VALIDATION_FILE] [-t TEST_FILE] [-gv VALIDATION_GROUND_TRUTH] [-gt TEST_GROUND_TRUTH] [-c NO_OF CLASSES] [-win WINDOWS/LINUX]
 ```
 
 You must pass the following four arguments:
@@ -159,11 +165,12 @@ You must pass the following four arguments:
 + -gv/ --valid_ground_truth : File path for the Validation split ground truth (.tsv file format).
 + -gt/ --test_ground_truth : File path for the Test split ground truth (.tsv file format).
 + -c/  --classes : No. of classes to perform optimization on (Integer 2 or 3/ Default value is 3)
++ -win/ --windows : 1- if using Windows systems; 0- if using Unix-like systems (including Ubuntu)
 
 To run this script, please execute the following command:
 
 ```
-python3 code/train_model/main.py -i data/Split_Dataset/Data/Train/train.npy -v data/Split_Dataset/Data/Valid/valid.npy -t data/Split_Dataset/Data/Test/test.npy -gv data/Split_Dataset/Ground_truth/relish_ground_truth_valid.tsv -gt data/Split_Dataset/Ground_truth/relish_ground_truth_test.tsv -c 2
+python3 code/train_model/main.py -i data/Split_Dataset/Data/train.npy -v data/Split_Dataset/Data/valid.npy -t data/Split_Dataset/Data/test.npy -gv data/Split_Dataset/Ground_truth/relish_ground_truth_valid.tsv -gt data/Split_Dataset/Ground_truth/relish_ground_truth_test.tsv -c 2 -win 0
 ```
 
 Precision@N and NDCG scores are saved to TSV files in the following folder path: \output_2 (2 classes) and \output_3 (3 classes) for further analysis and reporting.
