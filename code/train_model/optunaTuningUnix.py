@@ -170,6 +170,8 @@ def run_optuna_optimization(args , n_trials=10, n_jobs=1):
         print('Loading the existing study sampler!')
     except:
         restored_sampler = optuna.samplers.TPESampler(seed=42)
+        print('Creating new study sampler!')
+        
 
     # 4) Load the existing study or create a new one
     study = optuna.create_study(direction='maximize', study_name="Doc2Vec_tuning", 
