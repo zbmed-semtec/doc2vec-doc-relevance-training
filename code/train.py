@@ -1,20 +1,21 @@
 import os
 import time
 import argparse
+import logging
 import utilities as utilities
 
 def run(best_params, args, save_model=False):
 
     # 1) Load the training data
     train_pmids, train_docs = utilities.process_data_from_npy(args.input)
-    print("Retrieved RELISH Cleaned Data")
+    logging.info("Retrieved RELISH Cleaned Data")
 
     # 2) Train the model with 80% of the data and best parameters
     start = time.time()
     model = utilities.createDoc2VecModel(train_pmids, train_docs, best_params)
-    print(f"Time taken to train the model: {time.time() - start} seconds")
-    print("RELISH Hybrid Dord2Vec Model Generated.")
-    print(model, "Model is being used.")
+    logging.info(f"Time taken to train the model: {time.time() - start} seconds")
+    logging.info("RELISH Hybrid Dord2Vec Model Generated.")
+    logging.info("Model is being used.")
 
     # 3) Set the test data to be used based on tuning parameter
     dataset_type = "Test"
@@ -23,15 +24,15 @@ def run(best_params, args, save_model=False):
 
     # 4) Load the data from npy file
     pmids, docs = utilities.process_data_from_npy(data_file)
-    print(f"Retrieved RELISH Cleaned {dataset_type} Data")
+    logging.info(f"Retrieved RELISH Cleaned {dataset_type} Data")
 
     # 5) Generate the embeddings: pd.DataFrame for loaded docs
     embeddings_df = utilities.generate_embeddings(model, pmids, docs)
-    print(f"RELISH {dataset_type} Embeddings Pickle File Generated.")
+    logging.info(f"RELISH {dataset_type} Embeddings Pickle File Generated.")
 
     # 6) Generate the cosine similarity matrix: pd.DataFrame for the generated embeddings
     similarity_df = utilities.get_similarity_scores(ground_truth, embeddings_df)
-    print(f"RELISH {dataset_type} Cosine Similarity Matrix Generated.")
+    logging.info(f"RELISH {dataset_type} Cosine Similarity Matrix Generated.")
 
     # 7) Save the model in the given path if specified
     if save_model:
