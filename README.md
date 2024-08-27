@@ -3,17 +3,17 @@ This repository focuses on an approach exploring and evaluating literature-based
 
 ## 📚🔍 Table of Contents
 
-1. [About](#📝-about)
-2. [Input Data](#📂-input-data)
-3. [Pipeline](#🛠️-pipeline)
-    1. [Create Tagged Documents](#🔒📑-create-tagged-documents)
-    2. [Train and Optimize Doc2Vec models ](#🧠⚙️-train-and-optimize-doc2vec-models)
+1. [About](#📝about)
+2. [Input Data](#📂input-data)
+3. [Pipeline](#🛠️pipeline)
+    1. [Create Tagged Documents](#🔒📑create-tagged-documents)
+    2. [Train and Optimize Doc2Vec models ](#🧠⚙️train-and-optimize-doc2vec-models)
     3. [Calculate Cosine Similarity](#📐🔄calculate-cosine-similarity) 
-    4. [Evaluation](#📈📋-evaluation)
-        - [Precision@N](#🎯-precisionn)
-        - [nDCG@N](#📊-ndcgn)
+    4. [Evaluation](#📈📋evaluation)
+        - [Precision@N](#🎯precisionn)
+        - [nDCG@N](#📊ndcgn)
 4. [Code Implementation](#🧑‍💻🧩code-implementation)
-5. [Getting Started](#🚀-getting-started)
+5. [Getting Started](#🚀getting-started)
 6. [Tutorial](#📙tutorial)
 
 ## 📝About
