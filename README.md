@@ -16,11 +16,11 @@ This repository focuses on an approach exploring and evaluating literature-based
 5. [Getting Started](#🚀-getting-started)
 6. [Tutorial](#📙tutorial)
 
-## 📝 About
+## 📝About
 
  Our approach involves employing the [Doc2vec](https://arxiv.org/pdf/1405.4053v2.pdf) model, which extends the popular Doc2vec technique to capture document-level semantics. By encoding documents and their textual content into fixed-length vectors, Doc2vec facilitates similarity calculations and enables meaningful comparisons between documents. This approach is harnessed to derive insightful doc-2-doc recommendations within the realm of biomedical research, specifically employing the RELISH dataset. In order to do so, we employ the [Doc2vec model](https://radimrehurek.com/gensim/models/doc2vec.html) from the [Gensim](https://radimrehurek.com/gensim/index.html) library.
 
-## 📂 Input Data
+## 📂Input Data
 
 The input data for this method includes preprocessed tokens derived from the RELISH documents, a specialized database curated by experts for benchmarking document similarity in biomedical literature. The RELISH dataset comprises a JSON file containing PubMed IDs (PMIDs) along with document-to-document relevance assessments categorized as "relevant," "partial," or "irrelevant." Titles and abstracts of the associated articles were retrieved and stored in a TSV file. 
 
@@ -29,14 +29,14 @@ The title and abstract text are preprocessed, and the resulting tokens are store
 Additionally, the ground truth relevance assessments are used to evaluate the accuracy of the doc-2-doc recommendations, ensuring that the method's results align with expert judgments.
 
 
-## 🛠️ Pipeline
+## 🛠️Pipeline
 
 This section outlines the progression from generating document embeddings for each PMID of the RELISH corpus to conducting hyperparameter optimization and ultimately evaluating the effectiveness of the approach.
 
-#### 🔒📑 Create Tagged Documents 
+#### 🔒📑Create Tagged Documents 
 In this initial step, we create  `TaggedDocuments `, which associates each PMID with a corresponding list of words. Here, we combine the abstract and title of each document into a unified paragraph (or document). This unified text serves as the input for our Doc2Vec model, allowing it to capture the semantic meaning of the entire document.
 
-#### 🧠⚙️ Train and Optimize Doc2Vec models 
+#### 🧠⚙️Train and Optimize Doc2Vec models 
 In the second phase, we create and train Doc2Vec models with customizable hyperparameters to comprehend the connections between documents and words in a high-dimensional vector space. We aim to optimize these hyperparameters to establish the most effective relationship between cosine similarity and document relevance.
 
 To accomplish this we begin by splitting the dataset into a training set and a testing set. The training set is then used to train the Doc2Vec model, where we explore various hyperparameters to optimize its performance. This optimization process is crucial for enhancing the model's ability to capture meaningful relationships between cosine similarity and document relevance. For each set of hyperparameters, a Doc2Vec model is trained on the training split. 
@@ -55,16 +55,16 @@ Following this, we evaluate the model's performance on the testing set using Pre
 
 Following hyperparameter optimization where the best model gets saved, embeddings are generated for the test dataset using this trained model. Subsequently, cosine similarity is calculated for the test dataset embeddings, providing a measure of similarity between pairs of documents based on their learned representations. This enables the generation of a 4-column matrix [ PMID1 | PMID2 | Relevance | Cosine similarity ] containing cosine similarity scores for existing pairs of PMIDs within our corpus. For a more detailed explanation of the process, please refer to this [documentation](https://github.com/zbmed-semtec/medline-preprocessing/tree/main/code/Cosine_Similarity).
 
-## 📈📋 Evaluation
+## 📈📋Evaluation
 
 The effectiveness of the embeddings in capturing document-to-document similarity is assessed using two metrics: Precision@N and nDCG@N.
 
-### 🎯 Precision@N
+### 🎯Precision@N
 
 In order to evaluate the effectiveness of this approach, we make use of Precision@N. Precision@N measures the precision of retrieved documents at various cutoff points (N).We generate a Precision@N matrix for existing pairs of documents within the RELISH corpus, based on the original RELISH JSON file. The [code](./code/precision.py) determines the number of true positives within the top N pairs and computes Precision@N scores. The result is a Precision@N matrix with values at different cutoff points, including average scores. For detailed insights into the algorithm, please refer to this [documentation](https://github.com/zbmed-semtec/medline-preprocessing/tree/main/code/Precision%40N_existing_pairs).
 
 
-### 📊 nDCG@N
+### 📊nDCG@N
 
 Another metric used is the nDCG@N (normalized Discounted Cumulative Gain). This ranking metric assesses document retrieval quality by considering both relevance and document ranking. It operates by using a TSV file containing relevance and cosine similarity scores, involving the computation of DCG@N and iDCG@N scores. The result is an nDCG@N matrix for various cutoff values (N) and each PMID in the corpus, with detailed information available in the [documentation](https://github.com/zbmed-semtec/medline-preprocessing/tree/main/code/Evaluation).
 
@@ -83,7 +83,7 @@ Another metric used is the nDCG@N (normalized Discounted Cumulative Gain). This 
 
 + [`calculate_gain.py`](./code/calculate_gain.py): This script calculates normalized discounted cumulative gain (nDCG) scores for relevance assessment based on cosine similarity values, sorts data accordingly, and writes results including average nDCG scores to a TSV file. It utilizes the cosine similarity matrix provided and performs operations per PMID.
 
-## 🚀 Getting Started
+## 🚀Getting Started
 
 To get started with this project, follow these steps:
 
@@ -192,7 +192,7 @@ You must pass the following four arguments:
 To run this script, please execute the following command:
 
 ``` 
-python3 code/main.py -i data/Split_Dataset/Data/train.npy -t data/Split_Dataset/Data/test.npy -gt data/Split_Dataset/Ground_truth/test.tsv -c 3 -win 0
+python3 code/main.py -i data/Split_Dataset/Data/train.npy -t data/Split_Dataset/Data/test.npy -g data/Split_Dataset/Ground_truth/test.tsv -c 3 -win 0
  ``` 
 
 Precision@N and NDCG scores are saved to TSV files in the following folder path: \output_2 (2 classes) and \output_3 (3 classes) for further analysis and reporting.
