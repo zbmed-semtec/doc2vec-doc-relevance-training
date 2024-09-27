@@ -138,13 +138,13 @@ def calculate_cosine_similarity(vector_1: np.ndarray, vector_2: np.ndarray) -> f
     """
     return 1 - cosine(vector_1, vector_2)
 
-def get_similarity_scores(input_relevance_matrix: str, embeddings_df: pd.DataFrame) -> pd.DataFrame:
+def get_similarity_scores(relevance_matrix_df: pd.DataFrame, embeddings_df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate cosine similarity scores for pairs of PubMed IDs based on their embeddings and update a DataFrame with these scores.
 
     Parameters:
     ----------
-    input_relevance_matrix : str
+    relevance_matrix_df : pd.DataFrame
         File path to the TSV file containing pairs of PubMed IDs and a relevance value.
     embeddings_df : pd.DataFrame
         DataFrame containing PubMed IDs and their corresponding document embeddings.
@@ -155,20 +155,16 @@ def get_similarity_scores(input_relevance_matrix: str, embeddings_df: pd.DataFra
         Updated DataFrame with cosine similarity scores added for each pair.
     """
 
-    # 1) Read Relevance matrix
-    column_names = ["PMID1", "PMID2", "Value"]
-    relevance_matrix_df = pd.read_csv(input_relevance_matrix, sep="\t", names = column_names, skiprows=1)
-
-    # 2) Adds empty columns to the file to store similarity scores
+    # 1) Adds empty columns to the file to store similarity scores
     relevance_matrix_df["Cosine Similarity"] = ""
     
-    # 3) Create a dictionary to store embeddings
+    # 2) Create a dictionary to store embeddings
     embeddings_dict = {int(pmid): embedding for pmid, embedding in zip(embeddings_df['PMID'], embeddings_df['Embedding'])}
 
-    # 4) Create a list of reference and assessed PMID pairs
+    # 3) Create a list of reference and assessed PMID pairs
     pmid_pairs = list(zip(relevance_matrix_df["PMID1"], relevance_matrix_df["PMID2"]))
 
-    # 5) Calculate the cosine similarities between the document embeddings and update the relevance matrix dataframe
+    # 4) Calculate the cosine similarities between the document embeddings and update the relevance matrix dataframe
     for ref_pmid, assessed_pmid in tqdm.tqdm(pmid_pairs, total=len(pmid_pairs), desc="Calculating Similarities"):
         try:
             ref_pmid_vector = embeddings_dict[ref_pmid]
