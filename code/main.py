@@ -12,8 +12,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", help="Path to input (train) file")
     parser.add_argument("-t", "--test", help="Path to test data file")
-    parser.add_argument("-v", "--train_ground_truth", help="Path to train ground truth .tsv file")
-    parser.add_argument("-g", "--test_ground_truth", help="Path to test ground truth .tsv file")
+    parser.add_argument("-v", "--valid", help="Path to validation data file")
+    parser.add_argument("-gt", "--test_ground_truth", help="Path to test ground truth .tsv file")
+    parser.add_argument("-gv", "--valid_ground_truth", help="Path to validation ground truth .tsv file")
     parser.add_argument("-c", "--classes", type=int, default=3, help="Number of classes")
     parser.add_argument("-win", "--windows", type=int,
                     help="1: if using Windows systems; 0: if using Unix-like systems (including Ubuntu)")
@@ -38,6 +39,12 @@ if __name__ == "__main__":
     if not os.path.exists(embeddings_directory):
         os.makedirs(embeddings_directory)
     os.chmod(embeddings_directory, permissions)
+
+    # 4) Define the directory for storing validation results
+    results_directory = f"output_{args.classes}/validation"
+    if not os.path.exists(results_directory):
+        os.makedirs(results_directory)
+    os.chmod(results_directory, permissions)
 
     # 4) Define the directory for storing evaluation results
     results_directory = f"output_{args.classes}/evaluation"
@@ -66,13 +73,13 @@ if __name__ == "__main__":
         from optunaTuningWindows import run_optuna_optimization
         start = time.time()
         # NOTE: FOR OPTUNA HYPERPARAMETER REPRODUCIBILITY n_jobs should always be 1
-        best_params, best_trial = run_optuna_optimization(args, params, n_trials, n_jobs=1, n_splits=5)
+        best_params, best_trial = run_optuna_optimization(args, params, n_trials, n_jobs=1)
         print("Finished optuna optimization. Time taken:", time.time()-start)
     else:
         from optunaTuningUnix import run_optuna_optimization
         start = time.time()
         # NOTE: FOR OPTUNA HYPERPARAMETER REPRODUCIBILITY n_jobs should always be 1
-        best_params, best_trial = run_optuna_optimization(args, params, n_trials, n_jobs=1, n_splits=5)
+        best_params, best_trial = run_optuna_optimization(args, params, n_trials, n_jobs=1)
         print("Finished optuna optimization. Time taken:", time.time()-start)
 
     # ------------------Final Evaluation (once for test data)------------------
@@ -87,6 +94,8 @@ if __name__ == "__main__":
     logging.info("RELISH Hybrid Dord2Vec Model Generated.")
     logging.info("Model is being used.")
 
+    # model = os.path.join(results_directory, f"model")
+    # utilities.saveDoc2VecModel(model, )
     # 10) Loading test data
     test_pmids, test_docs = utilities.process_data_from_npy(data_file)
 

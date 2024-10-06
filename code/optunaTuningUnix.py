@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from train import run
-from train import kfold_train
+from train import run
 import utilities as utilities
 
 def save_data_with_lock(file_path, data, save_function):
@@ -43,9 +43,9 @@ def save_data_with_lock(file_path, data, save_function):
 def save_model_data(args, model, embeddings, similarity):
 
     # 1) Define the file path to save the model data
-    model_file = f"output_{args.classes}/model/Doc2Vec_best_model_{args.classes}"
-    embeddings_file = f"output_{args.classes}/embeddings/best_embeddings_{args.classes}.pkl"
-    similarity_file = f"output_{args.classes}/evaluation/best_cosine_similarity_{args.classes}.tsv"
+    model_file = f"output_{args.classes}/validation/Doc2Vec_best_model_{args.classes}"
+    embeddings_file = f"output_{args.classes}/validation/valid_embeddings_{args.classes}.pkl"
+    similarity_file = f"output_{args.classes}/validation/valid_cosine_similarity_{args.classes}.tsv"
 
     # 2) Save the model
     save_data_with_lock(model_file, model, utilities.saveDoc2VecModel)
@@ -57,7 +57,7 @@ def save_model_data(args, model, embeddings, similarity):
     save_data_with_lock(similarity_file, similarity, utilities.save_similarity_to_tsv)
 
 
-def objective_wrapper(args, params, n_splits=5):
+def objective_wrapper(args, params):
     def objective(trial):
 
         # 1) Suggest hyperparameters for fastText
@@ -85,7 +85,13 @@ def objective_wrapper(args, params, n_splits=5):
         }
 
         # 3) Run the k-fold training process to get the average precision
-        avg_precision_5 = kfold_train(args, params_dict, n_splits=n_splits)
+        # avg_precision_5 = kfold_train(args, params_dict, n_splits=n_splits)
+        similarity_df, embeddings_df, model = run(params, args) 
+        """
+            NOTE: The 'tuning' parameter dictates the dataset split used during the model run:
+            - If 'tuning' is set to True, the Validation split is used for model tuning.
+            - If 'tuning' is set to False, the Test split is utilized, typically for final evaluation.
+        """
 
         # 4) Load the previously saved best precision value
         best_precision_path = f"output_{args.classes}/best_precision_{args.classes}.txt"
@@ -122,7 +128,7 @@ def objective_wrapper(args, params, n_splits=5):
         return avg_precision_5
     return objective
 
-def run_optuna_optimization(args, params, n_trials, n_jobs=1, n_splits=5):
+def run_optuna_optimization(args, params, n_trials, n_jobs=1):
     """
     Runs an Optuna optimization process.
 
@@ -194,7 +200,7 @@ def run_optuna_optimization(args, params, n_trials, n_jobs=1, n_splits=5):
             pbar.update(1)
             callback(study, trial)
         
-        study.optimize(objective_wrapper(args, params, n_splits), n_trials=n_trials, callbacks=[pbar_callback], n_jobs=n_jobs)
+        study.optimize(objective_wrapper(args, params), n_trials=n_trials, callbacks=[pbar_callback], n_jobs=n_jobs)
 
     # 7) Save the study state
     study.trials_dataframe().to_csv(f"output_{args.classes}/optuna_study_state_{args.classes}.csv")
