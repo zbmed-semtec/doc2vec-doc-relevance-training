@@ -20,7 +20,7 @@ import pandas as pd
 from tqdm import tqdm
 from train import run
 import utilities as utilities
-
+import precision as precision
 
 def save_data_with_lock(file_path, data, save_function):
     """Utility function to handle file locking, data saving, and unlocking."""
@@ -44,8 +44,8 @@ def save_model_data(args, model, embeddings, similarity):
 
     # 1) Define the file path to save the model data
     model_file = f"output_{args.classes}/validation/Doc2Vec_best_model_{args.classes}"
-    embeddings_file = f"output_{args.classes}/validation/best_embeddings_{args.classes}.pkl"
-    similarity_file = f"output_{args.classes}/validation/best_cosine_similarity_{args.classes}.tsv"
+    embeddings_file = f"output_{args.classes}/validation/valid_embeddings_{args.classes}.pkl"
+    similarity_file = f"output_{args.classes}/validation/valid_cosine_similarity_{args.classes}.tsv"
 
     # 2) Save the model
     save_data_with_lock(model_file, model, utilities.saveDoc2VecModel)
@@ -84,10 +84,15 @@ def objective_wrapper(args, params):
             "seed": seed
         }
 
-        # # 3) Run the k-fold training process to get the average precision
-        # avg_precision_5 = kfold_train(args, params_dict, n_splits=n_splits)
-        similarity_df, embeddings_df, model = run(params, args) 
-        # 4) Load the previously saved best precision value
+         # 3) run(): Trains the model with specified parameters and returns similarity scores, embeddings, and the trained model itself.
+        similarity_df, embeddings_df, model = run(params_dict, args) 
+        
+         # 4) Compute precision@5 for all the reference pmids
+        ref_pmids = similarity_df["PMID1"].unique()
+        vector = precision.generate_vector(ref_pmids, similarity_df, args.classes)
+        precision_5 = list(np.mean(vector, axis=0).round(4))
+
+        # 5) Load the previously saved best precision value
         best_precision_path = f"output_{args.classes}/best_precision_{args.classes}.txt"
         if os.path.exists(best_precision_path):
             with open(best_precision_path, "r") as f:
@@ -95,9 +100,9 @@ def objective_wrapper(args, params):
         else:
             best_precision = -1.0
 
-        # 5) To avoid unnecessary computations and file-saving operations for trials that are suggested for pruning
+        # 6) To avoid unnecessary computations and file-saving operations for trials that are suggested for pruning
         if trial.should_prune(): #should_prune() does not support multi-objective optimization: it only considers a single objective/metric
-            return avg_precision_5
+            return precision_5
 
         """
         NOTE: 
@@ -106,20 +111,20 @@ def objective_wrapper(args, params):
         - This pruning process is designed to conserve computational resources by focusing efforts on more promising trials.
         """
 
-        # 6) Acquire the lock before updating best_precision and saving the best model
+        # 7) Acquire the lock before updating best_precision and saving the best model
         with precision_lock:
-            if avg_precision_5 > best_precision:
+            if precision_5 > best_precision:
                 best_precision = precision_5[0]  # Update the best precision
 
                 # Save the best model and its corresponding embeddings and similarity files
-                # save_model_data(args, model, embeddings_df, similarity_df)
-                # print('Best model updated and saved')
+                save_model_data(args, model, embeddings_df, similarity_df)
+                print('Best model updated and saved')
 
                 # Save the new best precision value
                 with open(best_precision_path, "w") as f:
                     f.write(str(best_precision))
         
-        return avg_precision_5
+        return precision_5
     return objective
 
 def run_optuna_optimization(args, params, n_trials, n_jobs=1):

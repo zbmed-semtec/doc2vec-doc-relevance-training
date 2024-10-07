@@ -7,6 +7,8 @@ import time
 import argparse
 import precision
 import calculate_gain
+import utilities
+import logging
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -91,39 +93,37 @@ if __name__ == "__main__":
     start = time.time()
     model = utilities.createDoc2VecModel(train_pmids, train_docs, best_params)
     logging.info(f"Time taken to train the model: {time.time() - start} seconds")
-    logging.info("RELISH Hybrid Dord2Vec Model Generated.")
+    logging.info("RELISH Doc2Vec Model Generated.")
     logging.info("Model is being used.")
 
-    # model = os.path.join(results_directory, f"model")
-    # utilities.saveDoc2VecModel(model, )
-    # 10) Loading test data
-    test_pmids, test_docs = utilities.process_data_from_npy(data_file)
+    # 10) Save the model
+    model_path = os.path.join(model_directory, f"model_{args.classes}")
+    utilities.saveDoc2VecModel(model, model_path)
 
-    # 11) Generate the embeddings: pd.DataFrame for test data
-    test_embeddings_df = utilities.generate_embeddings(model, pmids, docs)
+    # 11) Loading test data
+    test_pmids, test_docs = utilities.process_data_from_npy(args.test)
+
+    # 12) Generate the embeddings: pd.DataFrame for test data
+    test_embeddings_df = utilities.generate_embeddings(model, test_pmids, test_docs)
 
     # 12) Save the embeddings to a pickle file
-    test_embedding_file = os.path.join(results_directory, f"test_embeddings_{args.classes}.pkl")
-    utilities.save_embeddings(test_embeddings_df, test_embedding_file)
+    test_embedding_file = os.path.join(embeddings_directory, f"test_embeddings_{args.classes}.pkl")
+    utilities.save_embeddings_to_pickle(test_embeddings_df, test_embedding_file)
     
-    # 14) Load the groundtruth from the test tsv file
-    column_names = ["PMID1", "PMID2", "Value"]
-    test_ground_truth = pd.read_csv(args.test_ground_truth, sep="\t", names = column_names, skiprows=1)
+    # 13) Generate the cosine similarity matrix: pd.DataFrame for the generated embeddings
+    test_similarity_df = utilities.get_similarity_scores(args.test_ground_truth, test_embeddings_df)  
 
-    # 15) Generate the cosine similarity matrix: pd.DataFrame for the generated embeddings
-    similarity_df = utilities.get_similarity_scores(test_ground_truth, embeddings_df)  
-
-    # 16) Save the similarity scores to a TSV file
+    # 14) Save the similarity scores to a TSV file
     test_similarity_file = os.path.join(results_directory, f"test_cosine_similarity_{args.classes}.tsv") 
-    utilities.save_similarity_to_tsv(similarity_df, test_similarity_file)
+    utilities.save_similarity_to_tsv(test_similarity_df, test_similarity_file)
 
-    # 17) Generate and save the precision matrix
+    # 15) Generate and save the precision matrix
     ref_pmids, data = precision.read_file(test_similarity_file)
     matrix = precision.generate_matrix(ref_pmids, data, args.classes)
     precision.write_to_tsv(ref_pmids, matrix, precision_file, data)
     print("Final precision matrix saved")
 
-    # 18) Generate and save the DCG and IDCG matrices
+    # 16) Generate and save the DCG and IDCG matrices
     sim_matrix = calculate_gain.load_cosine_sim_matrix(test_similarity_file)
     calculate_gain.get_dcg_matrix(sim_matrix, dcg_file)
     calculate_gain.get_identity_dcg_matrix(sim_matrix, idcg_file)
