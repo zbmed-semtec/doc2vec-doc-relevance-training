@@ -36,7 +36,7 @@ if __name__ == "__main__":
         os.makedirs(model_directory)
     os.chmod(model_directory, permissions)
 
-    # 3) Define the Directory for Storing Embeddings
+    # 3) Define the Directory for storing Embeddings
     embeddings_directory = f"output_{args.classes}/embeddings"
     if not os.path.exists(embeddings_directory):
         os.makedirs(embeddings_directory)
@@ -48,20 +48,20 @@ if __name__ == "__main__":
         os.makedirs(results_directory)
     os.chmod(results_directory, permissions)
 
-    # 4) Define the directory for storing evaluation results
+    # 5) Define the directory for storing evaluation results
     results_directory = f"output_{args.classes}/evaluation"
     if not os.path.exists(results_directory):
         os.makedirs(results_directory)
     os.chmod(results_directory, permissions)
 
-    # 5) Define the file paths to store the evaluation results
+    # 6) Define the file paths to store the evaluation results
     log_file = os.path.join(results_directory,f"Optuna_{args.classes}.log")
     precision_file = os.path.join(results_directory, f"precision_{args.classes}.tsv")
     dcg_file = os.path.join(results_directory, f"dcg_{args.classes}.tsv")
     idcg_file = os.path.join(results_directory, f"idcg_{args.classes}.tsv")
     ndcg_file = os.path.join(results_directory, f"ndcg_{args.classes}.tsv")    
 
-    # 6) Define the directory for the hyperparameter yaml file
+    # 7) Define the directory for the hyperparameter yaml file
     parameter_file = "code/hyperparameters.yaml"
     os.chmod(parameter_file, permissions)
     with open(parameter_file, 'r') as file:
@@ -69,7 +69,7 @@ if __name__ == "__main__":
             params = content['params']
             n_trials = content['iterations']['n_trials']['value']
 
-    # 7) Run optuna optimization based on the operating system
+    # 8) Run optuna optimization based on the operating system
     # Optuna can run multiple trials concurrently using n_jobs parallel processes or threads
     if args.windows:
         from optunaTuningWindows import run_optuna_optimization
@@ -86,44 +86,44 @@ if __name__ == "__main__":
 
     # ------------------Final Evaluation (once for test data)------------------
 
-    # 8) Load the training data
+    # 9) Load the training data
     train_pmids, train_docs = utilities.process_data_from_npy(args.input)
 
-    # 9) Train the model with 80% of the data and best parameters
+    # 10) Train the model with 90% of the data and best parameters
     start = time.time()
     model = utilities.createDoc2VecModel(train_pmids, train_docs, best_params)
     logging.info(f"Time taken to train the model: {time.time() - start} seconds")
     logging.info("RELISH Doc2Vec Model Generated.")
     logging.info("Model is being used.")
 
-    # 10) Save the model
+    # 11) Save the model
     model_path = os.path.join(model_directory, f"model_{args.classes}")
     utilities.saveDoc2VecModel(model, model_path)
 
-    # 11) Loading test data
+    # 12) Loading test data
     test_pmids, test_docs = utilities.process_data_from_npy(args.test)
 
-    # 12) Generate the embeddings: pd.DataFrame for test data
+    # 13) Generate the embeddings: pd.DataFrame for test data
     test_embeddings_df = utilities.generate_embeddings(model, test_pmids, test_docs)
 
-    # 12) Save the embeddings to a pickle file
+    # 14) Save the embeddings to a pickle file
     test_embedding_file = os.path.join(embeddings_directory, f"test_embeddings_{args.classes}.pkl")
     utilities.save_embeddings_to_pickle(test_embeddings_df, test_embedding_file)
     
-    # 13) Generate the cosine similarity matrix: pd.DataFrame for the generated embeddings
+    # 15) Generate the cosine similarity matrix: pd.DataFrame for the generated embeddings
     test_similarity_df = utilities.get_similarity_scores(args.test_ground_truth, test_embeddings_df)  
 
-    # 14) Save the similarity scores to a TSV file
+    # 16) Save the similarity scores to a TSV file
     test_similarity_file = os.path.join(results_directory, f"test_cosine_similarity_{args.classes}.tsv") 
     utilities.save_similarity_to_tsv(test_similarity_df, test_similarity_file)
 
-    # 15) Generate and save the precision matrix
+    # 17) Generate and save the precision matrix
     ref_pmids, data = precision.read_file(test_similarity_file)
     matrix = precision.generate_matrix(ref_pmids, data, args.classes)
     precision.write_to_tsv(ref_pmids, matrix, precision_file, data)
     print("Final precision matrix saved")
 
-    # 16) Generate and save the DCG and IDCG matrices
+    # 18) Generate and save the DCG and IDCG matrices
     sim_matrix = calculate_gain.load_cosine_sim_matrix(test_similarity_file)
     calculate_gain.get_dcg_matrix(sim_matrix, dcg_file)
     calculate_gain.get_identity_dcg_matrix(sim_matrix, idcg_file)

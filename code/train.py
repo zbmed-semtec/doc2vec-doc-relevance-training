@@ -14,7 +14,7 @@ def run(best_params, args):
     train_pmids, train_docs = utilities.process_data_from_npy(args.input)
     logging.info("Retrieved RELISH Cleaned Train Data")
 
-    # 2) Train the model with 80% of the data and best parameters
+    # 2) Train the model with 90% of the data and best parameters
     start = time.time()
     model = utilities.createDoc2VecModel(train_pmids, train_docs, best_params)
     logging.info(f"Time taken to train the model: {time.time() - start} seconds")
