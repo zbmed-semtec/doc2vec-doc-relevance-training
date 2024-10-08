@@ -24,9 +24,9 @@ This repository focuses on an approach exploring and evaluating literature-based
 
 The input data for this method includes preprocessed tokens derived from the RELISH documents, a specialized database curated by experts for benchmarking document similarity in biomedical literature. The RELISH dataset comprises a JSON file containing PubMed IDs (PMIDs) along with document-to-document relevance assessments categorized as "relevant," "partial," or "irrelevant." Titles and abstracts of the associated articles were retrieved and stored in a TSV file. 
 
-The title and abstract text are preprocessed, and the resulting tokens are stored in the RELISH.npy file, which includes arrays of PMIDs, document titles, and abstracts. Within this preprocessing pipeline, both the title and abstract texts undergo several stages of refinement: stop words and structural words are eliminated, the text is converted to lowercase, and finally, tokenization is employed, resulting in arrays of individual words and is detailed in the [relish-preprocessing repository](https://github.com/zbmed-semtec/relish-preprocessing). The resulting preprocessed tokens are divided into training and test sets based on specific criteria detailed [here](https://github.com/zbmed-semtec/relish-preprocessing?tab=readme-ov-file#splitting-the-data). These splits are then saved as two separate .npy files.
+The title and abstract text are preprocessed, and the resulting tokens are stored in the RELISH.npy file, which includes arrays of PMIDs, document titles, and abstracts. Within this preprocessing pipeline, both the title and abstract texts undergo several stages of refinement: stop words and structural words are eliminated, the text is converted to lowercase, and finally, tokenization is employed, resulting in arrays of individual words and is detailed in the [relish-preprocessing repository](https://github.com/zbmed-semtec/relish-preprocessing). The resulting preprocessed tokens are divided into training, validation and test sets based on specific criteria detailed [here](https://github.com/zbmed-semtec/relish-preprocessing?tab=readme-ov-file#splitting-the-data). These splits are then saved as three separate .npy files.
 
-Additionally, the ground truth relevance assessments are used to evaluate the accuracy of the doc-2-doc recommendations, ensuring that the method's results align with expert judgments.
+Additionally, the ground truth relevance assessments are used to evaluate the accuracy of the doc-2-doc recommendations, ensuring that the method's results align with expert judgments. For this, we make use of the validation ground truth TSV file for hyperparameter optimization and the test ground truth TSV file for the final evaluation.
 
 
 ## 🛠️Pipeline
@@ -39,9 +39,9 @@ In this initial step, we create  `TaggedDocuments `, which associates each PMID 
 #### 🧠⚙️Train and Optimize Doc2Vec models 
 In the second phase, we create and train Doc2Vec models with customizable hyperparameters to comprehend the connections between documents and words in a high-dimensional vector space. We aim to optimize these hyperparameters to establish the most effective relationship between cosine similarity and document relevance.
 
-To accomplish this we begin by splitting the dataset into a training set and a testing set. The training set is then used to train the Doc2Vec model, where we explore various hyperparameters to optimize its performance. This optimization process is crucial for enhancing the model's ability to capture meaningful relationships between cosine similarity and document relevance. For each set of hyperparameters, a Doc2Vec model is trained on the training split. 
+To accomplish this we begin by splitting the dataset into a training set, a validation set and a testing set. The training set is then used to train the Doc2Vec model, where we explore various hyperparameters to optimize its performance. This optimization process is crucial for enhancing the model's ability to capture meaningful relationships between cosine similarity and document relevance. For each set of hyperparameters, a Doc2Vec model is trained on the training split. 
 
-Following this, we evaluate the model's performance on the testing set using Precision@5 as our evaluation metric.
+Following this, we evaluate the model's performance on the validation dataset using Precision@5 as our evaluation metric.
 
 ##### Parameters
 
@@ -71,11 +71,11 @@ Another metric used is the nDCG@N (normalized Discounted Cumulative Gain). This 
 ## 🧑‍💻🧩Code Implementation
 
 
-+ The [`main.py`](./code/main.py) serves as a comprehensive wrapper function, supporting the creation of tagged documents, model generation, training, embedding generation, cosine similarity matrix calculation, precision calculation and gain calculation in one pipeline. Individual functions for each task are provided in the other scripts:
++ The [`main.py`](./code/main.py) serves as a comprehensive wrapper function, supporting the creation of tagged documents, model generation, training, embedding generation, cosine similarity matrix calculation, precision calculation and gain calculation in one pipeline and the final evaluation for the test dataset. Individual functions for each task are provided in the other scripts:
 
 + [`optunaTuningUnix.py`](./code/optunaTuningUnix.py) / [`optunaTuningWindows.py`](./code/optunaTuningWindows.py) : The code utilizes Optuna for hyperparameter optimization of Doc2vec model. It suggests hyperparameters for Doc2vec, trains models, evaluates precision@5, and selects the best trial. The optimization process iterates over several trials, updating progress with a progress bar. The scripts are designed to run the pipeline on either Unix or Windows systems.
 
-+ [`train.py`](./code/train.py): This script trains a Doc2Vec model using specified hyperparameters, saves the model if specified, generates embeddings for test data, computes cosine similarity scores, and saves them to a file. It logs progress to a file specified by log_file.
++ [`train.py`](./code/train.py): This script trains a Doc2Vec model using specified hyperparameters, generates embeddings for validation data, computes cosine similarity scores, and saves them to a file. It logs progress to a file specified by log_file.
 
 + [`utilities.py`](./code/utilities.py): This scripts includes functions for parsing and reading input tokens, creation of tagged documents from input tokens, creation and training of Doc2Vec models, generation of embeddings, calculate cosine similarity, generate similarity matrix.
 
@@ -156,9 +156,11 @@ This script makes sure that the necessary folders are created and the files are 
       ├─ Data
       │  ├─ train.npy
       │  ├─ test.npy
+      │  ├─ valid.npy
       └─ Ground_truth
          ├─ train.tsv
-         └─ test.tsv
+         ├─ test.tsv
+         └─ valid.tsv
 
 ```
 
@@ -169,8 +171,8 @@ This pipeline aims to optimize hyperparameters for a Doc2Vec model using Optuna,
 #### Steps:
 
 - Hyperparameter Optimization: Utilizes Optuna to search for the best hyperparameters for the Doc2Vec model.
-- Model Training: Trains the Doc2Vec model with the optimal hyperparameters using 80% of the training split data.
-- Embedding Generation: Generates embeddings for the remaining 20% of the test split data using the trained model.
+- Model Training: Trains the Doc2Vec model with the optimal hyperparameters using 90% of the training split data.
+- Embedding Generation: Generates embeddings for 5% of the validation split data using the trained model.
 - Cosine Similarity Computation: Calculates cosine similarities for the generated embeddings.
 - Precision@N Calculation: Computes Precision@N scores, a measure of the relevance of retrieved documents, for the obtained cosine similarities.
 - NDCG Score Calculation: Computes normalized discounted cumulative gain (NDCG) scores, which assesses the quality of ranked search results based on relevance assessments.
@@ -178,22 +180,23 @@ This pipeline aims to optimize hyperparameters for a Doc2Vec model using Optuna,
 In order to start the pipeline execution use this [script](/code/train_model/main.py), and run the following command:
 
 ``` 
-python3 code/main.py [-i INPUT TRAIN FILE] [-t TEST_FILE] [-g GROUND_TRUTH_FILE] [-c NO_OF CLASSES] [-win WINDOWS/LINUX]
+python3 code/main.py [-i INPUT_TRAIN_FILE] [-t TEST_FILE] [-v VALIDATION_FILE] [-gt TEST_GROUND_TRUTH_FILE] [-gv VALIDATION_GROUND_TRUTH_FILE]  [-c NO_OF CLASSES] [-win WINDOWS/LINUX]
  ``` 
 
 You must pass the following four arguments:
 
 + -i/ --input : File path to the RELISH Train split dataset (.npy file format).
 + -t/ --test :  File path to the RELISH Test split dataset (.npy file format).
-+ -v/ --valid: File path to the RELISH Train split ground truth (.tsv file format).
-+ -g/ --ground_truth : File path for the Test split ground truth (.tsv file format).
++ -v/ --valid: File path to the RELISH Validation split dataset (.npy file format).
++ -gt/ --test_ground_truth : File path for the Test split ground truth (.tsv file format).
++ -gv/ --valid_ground_truth : File path for the Validation split ground truth (.tsv file format).
 + -c/  --classes : No. of classes to perform optimization on (Integer 2 or 3/ Default value is 3)
 + -win/ --windows : 1- if using Windows systems; 0- if using Unix-like systems (including Ubuntu)
 
 To run this script, please execute the following command:
 
 ``` 
-python3 code/main.py -i data/Split_Dataset/Data/train.npy -t data/Split_Dataset/Data/test.npy -v data/Split_Dataset/Ground_truth/train.tsv -g data/Split_Dataset/Ground_truth/test.tsv -c 3 -win 0
+python3 code/main.py -i data/Split_Dataset/Data/train.npy -t data/Split_Dataset/Data/test.npy -v data/Split_Dataset/Data/valid.npy -gt data/Split_Dataset/Ground_truth/test.tsv -gv data/Split_Dataset/Ground_truth/valid.tsv -c 3 -win 0
  ``` 
 
 Precision@N and NDCG scores are saved to TSV files in the following folder path: \output_2 (2 classes) and \output_3 (3 classes) for further analysis and reporting.
