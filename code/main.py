@@ -86,19 +86,23 @@ if __name__ == "__main__":
 
     # ------------------Final Evaluation (once for test data)------------------
 
-    # 9) Load the training data
-    train_pmids, train_docs = utilities.process_data_from_npy(args.input)
+    # # 9) Load the training data
+    # train_pmids, train_docs = utilities.process_data_from_npy(args.input)
 
-    # 10) Train the model with 90% of the data and best parameters
-    start = time.time()
-    model = utilities.createDoc2VecModel(train_pmids, train_docs, best_params)
-    logging.info(f"Time taken to train the model: {time.time() - start} seconds")
-    logging.info("RELISH Doc2Vec Model Generated.")
-    logging.info("Model is being used.")
+    # # 10) Train the model with 90% of the data and best parameters
+    # start = time.time()
+    # model = utilities.createDoc2VecModel(train_pmids, train_docs, best_params)
+    # logging.info(f"Time taken to train the model: {time.time() - start} seconds")
+    # logging.info("RELISH Doc2Vec Model Generated.")
+    # logging.info("Model is being used.")
 
-    # 11) Save the model
-    model_path = os.path.join(model_directory, f"model_{args.classes}")
-    utilities.saveDoc2VecModel(model, model_path)
+    # # 11) Save the model
+    # model_path = os.path.join(model_directory, f"model_{args.classes}")
+    # utilities.saveDoc2VecModel(model, model_path)
+
+    # Loading the model
+    model_file = f"output_{args.classes}/validation/Doc2Vec_best_model_{args.classes}"
+    utilities.loadDoc2VecModel(model_file)
 
     # 12) Loading test data
     test_pmids, test_docs = utilities.process_data_from_npy(args.test)
