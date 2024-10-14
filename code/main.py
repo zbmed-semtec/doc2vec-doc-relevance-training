@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
     # Loading the model
     model_file = f"output_{args.classes}/validation/Doc2Vec_best_model_{args.classes}"
-    utilities.loadDoc2VecModel(model_file)
+    model = utilities.loadDoc2VecModel(model_file)
 
     # 12) Loading test data
     test_pmids, test_docs = utilities.process_data_from_npy(args.test)
