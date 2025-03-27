@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15095071.svg)](https://doi.org/10.5281/zenodo.15095071)
+
 # Doc2Vec-Doc-relevance
 This repository focuses on an approach exploring and evaluating literature-based document-to-document (doc-2-doc) recommendations based on the Doc2Vec technique. The approach involves generating document-level embeddings and the dataset used is the RELISH Corpus, an expert-curated collection of biomedical literature consisting of pairwise document assessments. The workflow comprises of training Doc2Vec models on a predefined training set, using validation set for hyperparameter optimization followed by the assessment of doc-2-doc recommendations on a distinct test set. Additionally, Optuna is utilized to optimize the hyperparameters of the trained Doc2Vec models.
 
