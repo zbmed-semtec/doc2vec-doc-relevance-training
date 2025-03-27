@@ -1,11 +1,17 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
+title: doc2vec-doc-relevance-training
+abstract: An approach exploring and assessing literature-based doc-2-doc recommendations using doc2vec and applying it to the RELISH dataset
 authors:
-- family-names: "Talha"
-  given-names: "Muhammad"
 - family-names: "Ravinder"
   given-names: "Rohitha"
   orcid: "https://orcid.org/0009-0004-4484-6283"
+- family-names: "Venkatesh"
+  given-names: "Suhasini"
+  orcid: "https://orcid.org/0009-0005-7305-3052"  
+- family-names: "Quiñones"
+  given-names: "Nelson"
+  orchid: "https://orcid.org/0000-0002-5037-0443"
 - family-names: "Castro"
   given-names: "Leyla Jael"
   orcid: "https://orcid.org/0000-0003-3986-0510"
@@ -17,4 +23,4 @@ version: 1.0.0
 date-released: 2022-04-19
 license: GPL-3.0-or-later
 copyright: ZB MED
-repository-code: "https://github.com/zbmed-semtec/doc2vec-doc-relevance"
+repository-code: "https://github.com/zbmed-semtec/doc2vec-doc-relevance-training.git"
